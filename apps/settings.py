@@ -18,7 +18,7 @@ LOGIN_REDIRECT_URL = '/'
 EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = False
 EMAIL_BACKEND = 'sgbackend.SendGridBackend'
-SENDGRID_API_KEY = "SENDGRID API KEY"
+SENDGRID_API_KEY = "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"
 REGISTRATION_OPEN = True
 ONLY_SUPERUSERS_CAN_REGISTER_PEOPLE = False
 ACCOUNT_ACTIVATION_DAYS = 5
@@ -36,6 +36,30 @@ FILE_ROOT = os.environ.get('FILE_ROOT', '/home/directory/for/localground')
 STATIC_MEDIA_DIR = 'static'
 STATIC_URL = '/static/'
 USER_MEDIA_DIR = 'userdata'
+
+# Setup S3 storage for static files
+# https://www.caktusgroup.com/blog/2014/11/10/Using-Amazon-S3-to-store-your-Django-sites-static-and-media-files/
+
+# AWS_HEADERS = {  # see http://developer.yahoo.com/performance/rules.html#expires
+#     'Expires': 'Thu, 31 Dec 2099 20:00:00 GMT',
+#     'Cache-Control': 'max-age=94608000',
+# }
+
+from .s3_storage import StaticStorage, MediaStorage
+
+AWS_STORAGE_BUCKET_NAME = os.environ.get("S3_BUCKET_NAME", None) # localgroundtest
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", None) # AKIAI5BI37C6VVBUATGQ
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", None) # 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
+
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+
+STATICFILES_LOCATION = 'static'
+STATIC_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, STATICFILES_LOCATION)
+STATICFILES_STORAGE = StaticStorage
+
+MEDIAFILES_LOCATION = 'media'
+MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN, MEDIAFILES_LOCATION)
+DEFAULT_FILE_STORAGE = MediaStorage
 
 # Absolute path to the directory root of the local ground instance:
 STATIC_ROOT = '%s/%s' % (FILE_ROOT, STATIC_MEDIA_DIR)
@@ -198,6 +222,7 @@ INSTALLED_APPS = (
     'corsheaders',
     'djcelery',
     'social.apps.django_app.default',
+    'storages',
 )
 
 REST_FRAMEWORK = {

@@ -33,6 +33,8 @@ SwampDragon==0.4.2.2
 celery==3.1
 django-celery==3.1.17
 flower==0.9.0
+django-storages
+boto
 #MapScript (installed via apt-get (python-mapscript))
 #GDAL (installed via apt-get (python-gdal))
 
